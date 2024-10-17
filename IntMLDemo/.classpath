@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<classpath>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/17.0.12-linux-x86_64"/>
+	<classpathentry kind="src" path="src"/>
+	<classpathentry kind="lib" path="/home/sblazic/Desktop/IntMLDemo/IntMLDemo/lib/core.jar"/>
+	<classpathentry kind="lib" path="/home/sblazic/Desktop/IntMLDemo/IntMLDemo/lib/javamp3-1.0.4.jar"/>
+	<classpathentry kind="lib" path="/home/sblazic/Desktop/IntMLDemo/IntMLDemo/lib/jsyn-20171016.jar"/>
+	<classpathentry kind="lib" path="/home/sblazic/Desktop/IntMLDemo/IntMLDemo/lib/sound.jar"/>
+	<classpathentry kind="lib" path="/home/sblazic/Desktop/IntMLDemo/IntMLDemo/lib/weka.jar"/>
+	<classpathentry kind="output" path="bin"/>
+</classpath>
