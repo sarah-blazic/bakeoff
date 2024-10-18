@@ -61,7 +61,7 @@ model = models.Sequential([
     layers.MaxPooling2D((2, 2)),
     layers.Flatten(),
     layers.Dense(256, activation='relu'),
-    layers.Dropout(0.5),
+    layers.Dropout(0.6),
     layers.Dense(len(CLASSES), activation='softmax')
 ])
 model.compile(optimizer='adam',
@@ -70,12 +70,11 @@ model.compile(optimizer='adam',
 
 # Train the model
 print("Training model...")
-callback = EarlyStopping(monitor='loss', patience=3)
+callback = EarlyStopping(monitor='loss', patience=2)
 history = model.fit(X_train, y_train, epochs=EPOCHS, 
                     validation_data=(X_val, y_val), callbacks=[callback])
 print("Model trained.")
 
 # Save the model
-model_name = "audio_classification_model_temp.keras"
-model.save(os.path.join(MODEL_DIR, model_name))
-print(f"Model saved to {MODEL_DIR}/{model_name}")
+model.save(os.path.join(MODEL_DIR, MODEL_NAME))
+print(f"Model saved to {MODEL_DIR}/{MODEL_NAME}")

@@ -17,6 +17,7 @@ CLASSES = ['neutral', 'net', 'rim']
 DATA_DIR = 'PythonDemo/data'
 
 MODEL_DIR = 'PythonDemo/models'
+MODEL_NAME = 'audio_classification_model.keras'
 
 def select_audio_input_device():
     print("Available audio input devices:")

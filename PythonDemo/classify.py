@@ -12,9 +12,6 @@ import tkinter as tk
 import os
 from common import *
 
-# Current model to use for classification
-MODEL_NAME = 'audio_classification_model.keras'
-
 # Load the saved model
 model = models.load_model(os.path.join(MODEL_DIR, MODEL_NAME))
 print("Model loaded.")

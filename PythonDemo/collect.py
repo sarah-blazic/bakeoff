@@ -142,7 +142,7 @@ class AudioRecorder:
 
         # Create the filename using the next highest number
         filename = f"{next_number}.wav"
-        file_path = os.path.join(class_dir, filename)
+        file_path = os.path.join(class_dir, filename).replace("\\","/")
 
         # Write WAV file
         with wave.open(file_path, 'w') as wf:
