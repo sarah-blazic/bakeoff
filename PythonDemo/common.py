@@ -19,6 +19,8 @@ DATA_DIR = 'PythonDemo/data'
 MODEL_DIR = 'PythonDemo/models'
 MODEL_NAME = 'audio_classification_model.keras'
 
+CLASSIFIER_TYPE = "svm"
+
 def select_audio_input_device():
     print("Available audio input devices:")
     input_devices = []

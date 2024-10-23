@@ -1,5 +1,6 @@
 import numpy as np
 import librosa
+import joblib
 import librosa.display
 import matplotlib.pyplot as plt
 import tensorflow as tf
@@ -14,9 +15,19 @@ import threading
 from pynput import keyboard
 from common import *
 
-# Load the saved model
-model = models.load_model(os.path.join(MODEL_DIR, MODEL_NAME))
-print("Model loaded.")
+cnn_model_path = os.path.join(MODEL_DIR, MODEL_NAME)  # Path to the CNN model
+svm_model_path = os.path.join(MODEL_DIR, 'svm_model.joblib')  # Path to the SVM model
+
+# Load the appropriate model based on the classifier type
+if CLASSIFIER_TYPE == 'cnn':
+    # Load the saved CNN model
+    model = models.load_model(cnn_model_path)
+    print("CNN model loaded.")
+elif CLASSIFIER_TYPE == 'svm':
+    # Load the saved SVM model
+    model = joblib.load(svm_model_path)
+    print("SVM model loaded.")
+
 
 # Initialize variables
 recording = False
@@ -52,9 +63,20 @@ def process_audio():
                 mel_spect = (mel_spect - mel_spect.min()) / (mel_spect.max() - mel_spect.min() + 1e-6)
                 # Reshape for model input
                 input_data = mel_spect[np.newaxis, ..., np.newaxis]
-                # Predict
-                prediction = model.predict(input_data, verbose=0)
-                predicted_class = CLASSES[np.argmax(prediction)]
+                # Predict depending on classifier type
+                if CLASSIFIER_TYPE == 'cnn':
+                    # Reshape for CNN input (4D: batch, height, width, channels)
+                    input_data = mel_spect[np.newaxis, ..., np.newaxis]
+                    # Predict using the CNN
+                    prediction = model.predict(input_data, verbose=None)
+                    predicted_class = CLASSES[np.argmax(prediction)]
+                elif CLASSIFIER_TYPE == 'svm':
+                    # Reshape for SVM input (flatten the spectrograms)
+                    input_data = mel_spect.flatten().reshape(1, -1)
+                    # Predict using the SVM
+                    prediction = model.predict(input_data)
+                    predicted_class = CLASSES[prediction[0]]
+                
                 # Add to list
                 classifications.append(predicted_class)
                 # Sleep to maintain 200ms intervals
@@ -74,8 +96,12 @@ def on_press(key):
                 print("Recording started. Press spacebar again to stop.")
             else:
                 print("Classifications during this session:")
+                interactions = set()
                 for idx, classification in enumerate(classifications, 1):
                     print(f"{idx}. {classification}")
+                    interactions.add(classification)
+                # Print the interaction set 
+                print("Total Interactions:", interactions)
                 # Clear classifications for the next recording session
                 classifications.clear()
                 print("\nPress spacebar to start new recording.")
