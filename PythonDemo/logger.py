@@ -96,9 +96,12 @@ def process_audio():
                     predicted_class = CLASSES[prediction[0]]
                 
                 # Add to list
-                classifications.append(predicted_class)
-                # Sleep to maintain 200ms intervals
-                time.sleep(DURATION)
+                if 'rim' in classifications and predicted_class == 'net':
+                    time.sleep(DURATION)
+                else:
+                    classifications.append(predicted_class)
+                    # Sleep to maintain 200ms intervals
+                    time.sleep(DURATION)
             else:
                 time.sleep(0.01)  # Slight delay to prevent busy waiting
         else:
