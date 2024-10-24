@@ -5,6 +5,7 @@ import librosa.display
 import matplotlib.pyplot as plt
 import tensorflow as tf
 from tensorflow.keras import models
+from sklearn.decomposition import PCA
 import sounddevice as sd
 import queue
 import time
@@ -98,6 +99,7 @@ def update_gui():
             elif CLASSIFIER_TYPE == 'svm':
                 # Reshape for SVM input (flatten the spectrograms)
                 input_data = mel_spect.flatten().reshape(1, -1)
+                
                 # Predict using the SVM
                 prediction = model.predict(input_data)
                 predicted_class = CLASSES[prediction[0]]

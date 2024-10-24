@@ -3,7 +3,7 @@ import sounddevice as sd
 FONT = "Cambria"
 
 # Audio settings
-SAMPLE_RATE = 22050  # Sample rate of audio files
+SAMPLE_RATE = 22050 # 100,000  # Sample rate of audio files
 DURATION = 0.2  # Duration to record in seconds
 N_MELS = 64  # Number of Mel bands to generate
 HOP_LENGTH = 512  # Number of samples between successive frames
@@ -19,7 +19,7 @@ DATA_DIR = 'PythonDemo/data'
 MODEL_DIR = 'PythonDemo/models'
 MODEL_NAME = 'audio_classification_model.keras'
 
-CLASSIFIER_TYPE = "svm"
+CLASSIFIER_TYPE = "cnn"
 
 def select_audio_input_device():
     print("Available audio input devices:")

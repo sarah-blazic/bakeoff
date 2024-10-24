@@ -6,10 +6,20 @@ from tensorflow.keras import layers, models
 from tensorflow.keras.callbacks import EarlyStopping
 from sklearn.model_selection import train_test_split
 from sklearn.svm import SVC
+from sklearn.decomposition import PCA
 from sklearn.metrics import accuracy_score
 from sklearn.preprocessing import StandardScaler
 import joblib  # Import joblib for saving and loading the SVM model
+from scipy.signal import iirnotch, filtfilt  # Import for filtering
 from common import *
+
+def apply_notch_filter(signal, sr, freq, quality):
+    """Apply a notch filter to remove a specific frequency (e.g., 60 Hz) from the signal."""
+    notch_freq = freq  # The frequency to remove (e.g., 60 Hz)
+    quality_factor = quality  # Quality factor for the notch filter
+    b, a = iirnotch(notch_freq, quality_factor, sr)
+    filtered_signal = filtfilt(b, a, signal)
+    return filtered_signal
 
 def load_data(data_path):
     X = []
@@ -21,15 +31,21 @@ def load_data(data_path):
                 file_path = os.path.join(folder, file)
                 # Load audio file
                 signal, sr = librosa.load(file_path, sr=SAMPLE_RATE, duration=DURATION)
+                
+                # Apply the notch filter to remove the buzzing noise
+                signal = apply_notch_filter(signal, sr, freq=3500.0, quality=19.0)
+                
                 # Ensure that all signals are the same length
                 if len(signal) < SAMPLE_RATE * DURATION:
                     pad_width = SAMPLE_RATE * DURATION - len(signal)
                     signal = np.pad(signal, (0, pad_width), 'constant')
                 else:
                     signal = signal[:int(SAMPLE_RATE * DURATION)]
+                
                 # Compute Mel spectrogram
                 mel_spect = librosa.feature.melspectrogram(y=signal, sr=sr, n_mels=N_MELS, hop_length=HOP_LENGTH)
                 mel_spect = librosa.power_to_db(mel_spect, ref=np.max)
+                
                 # Normalize
                 mel_spect = (mel_spect - mel_spect.min()) / (mel_spect.max() - mel_spect.min() + 1e-6)
                 X.append(mel_spect)
@@ -42,14 +58,14 @@ def train_svm(X_train, X_val, y_train, y_val, svm_model_path):
     # Reshape data for SVM (flatten the spectrograms)
     X_train_flat = X_train.reshape(len(X_train), -1)
     X_val_flat = X_val.reshape(len(X_val), -1)
-
-    # Standardize the data
-    scaler = StandardScaler()
-    X_train_flat = scaler.fit_transform(X_train_flat)
-    X_val_flat = scaler.transform(X_val_flat)
+    
+    # pca = PCA(n_components=60)
+    
+    # X_train_flat = pca.fit_transform(X=X_train_flat)
+    # X_val_flat = pca.transform(X=X_val_flat)
 
     # Train the SVM classifier
-    svm = SVC(kernel='linear', C=1)
+    svm = SVC(kernel='linear', random_state=42)
     svm.fit(X_train_flat, y_train)
 
     # Validate the model
@@ -103,7 +119,6 @@ X = X[..., np.newaxis]  # Add channel dimension
 
 # Split data into training and validation sets
 X_train, X_val, y_train, y_val = train_test_split(X, y, test_size=0.2, random_state=42)
-
 
 svm_model_path = os.path.join(MODEL_DIR, 'svm_model.joblib')
 
